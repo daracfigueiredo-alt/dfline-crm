@@ -2889,6 +2889,12 @@ function DealModal({deal,user,camps,teams,users,lostReasons,setLostReasons,onClo
                         const updatedDeal={...f,wonEntradaCompleta:true,column:newCol};
                         setF(updatedDeal);
                         onSave({...updatedDeal,id:deal?deal.id:Date.now()});
+                      }else{
+                        // Antes o botão simplesmente não fazia nada quando o valor informado
+                        // era menor que o residual pendente, dando a impressão de que o card
+                        // tinha travado em "Entrada Pendente". Agora avisamos o motivo.
+                        const falta=(f.wonResidualValue||0)-v;
+                        alert(`Valor informado (${fmt(v)}) ainda é menor que o residual pendente (${fmt(f.wonResidualValue||0)}). Faltam ${fmt(falta)} para concluir a entrada.`);
                       }
                     }}>✓ Atualizar</button>
                   </div>
