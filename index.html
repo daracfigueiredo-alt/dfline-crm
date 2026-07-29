@@ -2035,7 +2035,7 @@ function CampanhaCombo({value, onChange, camps}){
   );
 }
 
-function DealModal({deal,user,camps,teams,users,lostReasons,setLostReasons,onClose,onSave,onDelete,globalTags,setGlobalTags,columns:colsProp,defaultColumn,taskTypes,prefill,isViewer}){
+function DealModal({deal,user,camps,teams,users,lostReasons,setLostReasons,onClose,onSave,onDelete,onReactivate,globalTags,setGlobalTags,columns:colsProp,defaultColumn,taskTypes,prefill,isViewer}){
   const columns = colsProp || DEFAULT_COLUMNS;
   const allTT = taskTypes||DEFAULT_TASK_TYPES;
   const isNew=!deal;
@@ -2323,6 +2323,9 @@ function DealModal({deal,user,camps,teams,users,lostReasons,setLostReasons,onClo
     const reactivated={...f,won:false,lost:false,lostReason:'',wonValue:0,wonDate:'',wonEntradaCompleta:null,wonResidualDate:'',wonResidualValue:0,column:newCol,id:deal.id};
     setF(reactivated); // atualiza estado local para refletir imediatamente
     onSave(reactivated);
+    // Garante que a aba do kanban volte para "Funil Ativo": sem isso o lead reativado
+    // some da aba "Fechados" (onde o usuário está) e parece ter sido apagado.
+    if(typeof onReactivate==='function') onReactivate(reactivated);
     onClose(); // fecha o modal para evitar que um "Salvar" posterior sobrescreva com dados antigos
   }
   function handleLost(){if(!lr.trim()){alert('Selecione o motivo da perda.');return;}
@@ -3669,7 +3672,7 @@ function KanbanView({deals,setDeals,user,camps,teams,users,lostReasons,setLostRe
           );
         })}
       </div>}
-      {modal&&<DealModal deal={sel} user={user} camps={camps} teams={teams} users={users} lostReasons={lostReasons} setLostReasons={setLostReasons} globalTags={globalTags} setGlobalTags={setGlobalTags} onClose={()=>{setModal(false);setNewPrefill({});}} onSave={handleSave} onDelete={handleDelete} columns={columns} defaultColumn={defCol} taskTypes={taskTypes} prefill={newPrefill} isViewer={isViewer}/>}
+      {modal&&<DealModal deal={sel} user={user} camps={camps} teams={teams} users={users} lostReasons={lostReasons} setLostReasons={setLostReasons} globalTags={globalTags} setGlobalTags={setGlobalTags} onClose={()=>{setModal(false);setNewPrefill({});}} onSave={handleSave} onDelete={handleDelete} onReactivate={()=>setKanbanTab('active')} columns={columns} defaultColumn={defCol} taskTypes={taskTypes} prefill={newPrefill} isViewer={isViewer}/>}
       {pbxFeedback&&<PBX55FeedbackModal deal={pbxFeedback.deal} callId={pbxFeedback.callId} onSave={save55PBXFeedback} onClose={()=>setPbxFeedback(null)}/>}
       {toast&&<div className="toast">{toast}</div>}
     </div>
